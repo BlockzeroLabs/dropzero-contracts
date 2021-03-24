@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
 import "./libraries/Create2.sol";
 
@@ -10,6 +10,8 @@ import "./interfaces/IFactoryDrop.sol";
 
 contract FactoryDrop is IFactoryDrop {
     mapping(address => address) public override contractList;
+
+    bool public feeStatus=true;
 
     event ClaimAdded(
         uint256 tokenAmount,

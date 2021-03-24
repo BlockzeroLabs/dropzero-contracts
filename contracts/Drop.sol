@@ -1,28 +1,48 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 import "./utils/Ownable.sol";
 import "./libraries/MerkleProof.sol";
 import "./interfaces/IERC20.sol";
-import "./libraries/SafeMath.sol";
+import "./libraries/SafeMath.sol"; 
 import "./interfaces/IDrop.sol";
+import "./libraries/SafeErc20.sol";
 
 contract Drop is IDrop {
   using SafeMath for uint256;
   using MerkleProof for bytes;
+  using SafeERC20 for IERC20;
 
   struct DropData {
     address owner;
     uint256 deadline;
     uint256 tokenAmount;
+    bool fees;
   }
+  
+  // 10% fee by default for timelock
 
+  uint256 public feePercent = 1000;
+
+  address public INDEX_FUND_ADDRESS;
+  
   address public FACTORY_ADDRESS;
+  
+  address public TIMELOCK_ADDRESS; 
+  
+
+
 
   modifier onlyFactory {
     require(msg.sender == FACTORY_ADDRESS, "Drop:: Not factory address");
     _;
   }
+
+  modifier onlyTimelockContract {
+    require(msg.sender == TIMELOCK_ADDRESS,"Drop:: Not timelock address");
+    _;
+  }
+
 
   address public TOKEN;
 
@@ -32,6 +52,8 @@ contract Drop is IDrop {
 
   mapping(bytes32 => mapping(uint256 => uint256)) private claimedBitMap;
 
+   
+  
   event Withdrawn(address account, bytes32 root);
 
   event Claimed(
@@ -41,8 +63,15 @@ contract Drop is IDrop {
     address sender
   );
 
-  constructor() public {
+  event IndexAddressChanged(address indexed newAddress);
+
+  event FeesPercentChanged(uint256 newFeePercent);
+
+  event FeeStatusChanged(bytes32 rootHash, uint256 amount, bool status, uint256 deadline);
+
+ constructor() {
     FACTORY_ADDRESS = msg.sender;
+    TIMELOCK_ADDRESS = msg.sender;
   }
 
   function initialize(address tokenAddress) external override onlyFactory {
@@ -53,13 +82,16 @@ contract Drop is IDrop {
     address owner,
     bytes32 root,
     uint256 deadline,
-    uint256 tokenAmount
+    uint256 tokenAmount,
+    bool fees
   ) external override onlyFactory {
+    
     require(!merkleRoots[root] == true, "Drop:: Claim already exists");
 
-    dropData[root] = (DropData(owner, deadline, tokenAmount));
+    dropData[root] = (DropData(owner, deadline, tokenAmount,fees));
 
     merkleRoots[root] = true;
+    
   }
 
   function isClaimed(uint256 index, bytes32 rootHash)
@@ -92,10 +124,11 @@ contract Drop is IDrop {
   function multipleClaim(
     uint256[] calldata index,
     address account,
-    uint256[] calldata amount,
+    uint256[] memory amount,
     bytes32[][] calldata merkleProof,
     bytes32[] calldata rootHashes
   ) external override returns (uint256 amountClaimed) {
+    
     for (uint256 i = 0; i < rootHashes.length; i++) {
       require(
         merkleRoots[rootHashes[i]] == true,
@@ -119,6 +152,13 @@ contract Drop is IDrop {
 
       _setClaimed(index[i], rootHashes[i]);
 
+      // Subtracting the percentage fees if fees status is true
+
+     if(dropData[rootHashes[i]].fees==true)
+    {
+      amount[i] = amount[i].sub(calculatePercentage(amount[i]));
+    }
+      
       amountClaimed = amountClaimed.add(amount[i]);
 
       dropData[rootHashes[i]].tokenAmount = dropData[rootHashes[i]]
@@ -128,10 +168,12 @@ contract Drop is IDrop {
       emit Claimed(index[i], amount[i], rootHashes[i], account);
     }
 
-    require(
-      IERC20(TOKEN).transfer(account, amountClaimed),
-      "Drop:: Transfer failed."
-    );
+    IERC20(TOKEN).safeTransfer(account, amountClaimed);
+    
+    //require(
+    //  IERC20(TOKEN).transfer(account, amountClaimed),
+    //  "Drop:: Transfer failed."
+    //);
   }
 
   function singleClaim(
@@ -155,9 +197,18 @@ contract Drop is IDrop {
 
     _setClaimed(index, rootHash);
 
+    // Subtracting the percentage fees if fees status is true
+    
+    if(dropData[rootHash].fees==true)
+    {
+      amount = amount.sub(calculatePercentage(amount));
+    }
+  
     amountClaimed = amount;
 
-    require(IERC20(TOKEN).transfer(account, amount), "Drop:: Transfer failed");
+    IERC20(TOKEN).safeTransfer(account, amount);
+    
+    //require(IERC20(TOKEN).transfer(account, amount), "Drop:: Transfer failed");
 
     dropData[rootHash].tokenAmount = dropData[rootHash].tokenAmount.sub(amount);
 
@@ -186,7 +237,10 @@ contract Drop is IDrop {
     }
 
     if (amount > 0) {
-      IERC20(TOKEN).transfer(account, dropData[merkleRoot].tokenAmount);
+      
+      IERC20(TOKEN).safeTransfer(account,dropData[merkleRoot].tokenAmount);
+      
+      //IERC20(TOKEN).transfer(account, dropData[merkleRoot].tokenAmount);
       delete dropData[merkleRoot];
       emit Withdrawn(account, merkleRoot);
     }
@@ -199,4 +253,47 @@ contract Drop is IDrop {
     }
     return false;
   }
+
+  function changeFeesPercent(uint256 percent) external override onlyTimelockContract{
+    
+    require(percent<=10000 , "Drop :: Invalid fee percent value");
+    
+    feePercent = percent;
+
+    emit FeesPercentChanged(percent);
+  }
+
+  
+  function changeIndexFundAddress(address indexFundAddress) external override onlyTimelockContract{
+    
+    INDEX_FUND_ADDRESS = indexFundAddress;
+    
+    emit IndexAddressChanged(indexFundAddress);
+  }
+
+  function changeFeeStatus(bytes32 rootHash) external override onlyTimelockContract{
+    
+    require(
+      merkleRoots[rootHash] == true,
+      "Drop:: Merkle root does not exist"
+    );
+
+    dropData[rootHash].fees = !dropData[rootHash].fees;
+
+    emit FeeStatusChanged(rootHash, dropData[rootHash].tokenAmount, dropData[rootHash].fees, dropData[rootHash].deadline);
+
+  }
+  
+  
+  function calculatePercentage(uint256 amount) public returns(uint256){
+      amount = (amount.mul(feePercent)).div(10000);
+      //Transfering the fees percentage to index fund
+      IERC20(TOKEN).safeTransfer(INDEX_FUND_ADDRESS,amount);
+    
+    return amount;
+
+
+  }
+
+   
 }
