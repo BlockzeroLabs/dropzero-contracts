@@ -36,6 +36,7 @@ contract DropFactory is IDropFactory {
         address dropAddress = drops[tokenAddress];
         IERC20(tokenAddress).transferFrom(msg.sender, dropAddress, tokenAmount);
         Drop(dropAddress).addDropData(msg.sender, merkleRoot, deadline, tokenAmount);
+        emit DropDataAdded(tokenAddress, merkleRoot, tokenAmount, deadline);
     }
 
     function claimFromDrop(
@@ -46,7 +47,7 @@ contract DropFactory is IDropFactory {
         bytes32[] calldata merkleProof
     ) external override dropExists(tokenAddress) {
         Drop(drops[tokenAddress]).claim(index, msg.sender, amount, merkleRoot, merkleProof);
-        DropClaimed(tokenAddress, index, msg.sender, amount, merkleRoot);
+        emit DropClaimed(tokenAddress, index, msg.sender, amount, merkleRoot);
     }
 
     function multipleClaimsFromDrop(
@@ -60,7 +61,7 @@ contract DropFactory is IDropFactory {
         address user = msg.sender;
         for (uint256 i = 0; i < indexes.length; i++) {
             Drop(dropAddress).claim(indexes[i], user, amounts[i], merkleRoots[i], merkleProofs[i]);
-            DropClaimed(tokenAddress, indexes[i], user, amounts[i], merkleRoots[i]);
+            emit DropClaimed(tokenAddress, indexes[i], user, amounts[i], merkleRoots[i]);
         }
     }
 

@@ -36,6 +36,7 @@ interface IDropFactory {
     ) external view returns (bool);
 
     event DropCreated(address indexed dropAddress, address indexed tokenAddress);
+    event DropDataAdded(address indexed tokenAddress, bytes32 merkleRoot, uint256 tokenAmount, uint256 deadline);
     event DropClaimed(address indexed tokenAddress, uint256 index, address indexed account, uint256 amount, bytes32 indexed merkleRoot);
     event DropWithdrawn(address indexed tokenAddress, address indexed account, bytes32 indexed merkleRoot, uint256 amount);
 }
