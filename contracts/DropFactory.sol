@@ -19,6 +19,7 @@ contract DropFactory is IDropFactory {
     }
 
     function createDrop(address tokenAddress) external override {
+        require(drops[tokenAddress] == address(0), "FACTORY_DROP_EXISTS");
         bytes memory bytecode = type(Drop).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(tokenAddress));
         address dropAddress = Create2.deploy(0, salt, bytecode);
