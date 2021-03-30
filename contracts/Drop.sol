@@ -63,7 +63,7 @@ contract Drop {
 
         // Mark it claimed and send the tokens.
         _setClaimed(index, merkleRoot);
-        IERC20(token).transfer(account, amount);
+        IERC20(token).safeTransfer(account, amount);
     }
 
     function withdrawAfterDeadline(address account, bytes32 merkleRoot) external onlyFactory returns (uint256) {
@@ -73,7 +73,7 @@ contract Drop {
 
         delete dropData[merkleRoot];
 
-        IERC20(token).transfer(account, dd.tokenAmount);
+        IERC20(token).safeTransfer(account, dd.tokenAmount);
         return dd.tokenAmount;
     }
 

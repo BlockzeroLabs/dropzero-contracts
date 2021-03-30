@@ -35,7 +35,7 @@ contract DropFactory is IDropFactory {
         address tokenAddress
     ) external override dropExists(tokenAddress) {
         address dropAddress = drops[tokenAddress];
-        IERC20(tokenAddress).transferFrom(msg.sender, dropAddress, tokenAmount);
+        IERC20(tokenAddress).safeTransferFrom(msg.sender, dropAddress, tokenAmount);
         Drop(dropAddress).addDropData(msg.sender, merkleRoot, deadline, tokenAmount);
         emit DropDataAdded(tokenAddress, merkleRoot, tokenAmount, deadline);
     }
