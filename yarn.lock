@@ -1020,6 +1020,11 @@
     "@types/sinon-chai" "^3.2.3"
     "@types/web3" "1.0.19"
 
+"@openzeppelin/contracts@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.0.0.tgz#54d1de30911635020c383cb73b160b698e7ae179"
+  integrity sha512-UcIJl/vUVjTr3H1yYXZi7Sr2PlXzBEHVUJKOUlVyzyy0FI8oQCCy0Wx+BuK/fojdnmLeMvUk4KUvhKUybP+C7Q==
+
 "@resolver-engine/core@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@resolver-engine/core/-/core-0.3.3.tgz#590f77d85d45bc7ecc4e06c654f41345db6ca967"
@@ -8645,10 +8650,10 @@ solc@0.7.3:
     semver "^5.5.0"
     tmp "0.0.33"
 
-solc@0.8.1:
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/solc/-/solc-0.8.1.tgz#cbdba8fea6fbfae463f382cecb59c51de0269472"
-  integrity sha512-rqB8wlL20I/k+ibCgNGqXaoXBngKTUb3JCsCazwEvxJ9C9RcXNGRsiqgB1xZs37IjINMp0E3xGiuMjGYTBQnUg==
+solc@0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/solc/-/solc-0.8.3.tgz#896fdca2f0c4ccf18ff7a99f8183a5a1a8f6345c"
+  integrity sha512-VZvSHtwe2zAsoviClIpWjvrg22bIZ0pLtzFrYD9BtPfR7mhMZYwpptnzRizNaSvMngTR+gB9Ul8IyL5xaC7+jw==
   dependencies:
     command-exists "^1.2.8"
     commander "3.0.2"
