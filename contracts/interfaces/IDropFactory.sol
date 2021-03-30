@@ -6,7 +6,8 @@ interface IDropFactory {
 
     function addDropData(
         uint256 tokenAmount,
-        uint256 deadline,
+        uint256 startDate,
+        uint256 endDate,
         bytes32 merkleRoot,
         address tokenAddress
     ) external;
@@ -27,7 +28,15 @@ interface IDropFactory {
         bytes32[][] calldata merkleProofs
     ) external;
 
-    function withdrawFromDropAfterDeadline(address tokenAddress, bytes32 merkleRoot) external;
+    function withdraw(address tokenAddress, bytes32 merkleRoot) external;
+
+    function pause(address tokenAddress, bytes32 merkleRoot) external;
+
+    function unpause(address tokenAddress, bytes32 merkleRoot) external;
+
+    function updateFeeReceiver(address newFeeReceiver) external;
+
+    function updateFee(uint256 newFee) external;
 
     function isDropClaimed(
         address tokenAddress,
@@ -35,8 +44,19 @@ interface IDropFactory {
         bytes32 merkleRoot
     ) external view returns (bool);
 
+    function getDropDetails(address tokenAddress, bytes32 merkleRoot)
+        external
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            address,
+            bool
+        );
+
     event DropCreated(address indexed dropAddress, address indexed tokenAddress);
-    event DropDataAdded(address indexed tokenAddress, bytes32 merkleRoot, uint256 tokenAmount, uint256 deadline);
+    event DropDataAdded(address indexed tokenAddress, bytes32 merkleRoot, uint256 tokenAmount, uint256 startDate, uint256 endDate);
     event DropClaimed(address indexed tokenAddress, uint256 index, address indexed account, uint256 amount, bytes32 indexed merkleRoot);
     event DropWithdrawn(address indexed tokenAddress, address indexed account, bytes32 indexed merkleRoot, uint256 amount);
 }
