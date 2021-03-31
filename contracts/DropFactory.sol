@@ -11,10 +11,28 @@ import "./Drop.sol";
 contract DropFactory is IDropFactory {
     using SafeERC20 for IERC20;
 
+    uint256 public fee;
+    address public feeReceiver;
+    address public timelock;
     mapping(address => address) public drops;
+
+    constructor(
+        uint256 _fee,
+        address _feeReceiver,
+        address _timelock
+    ) {
+        fee = _fee;
+        feeReceiver = _feeReceiver;
+        timelock = _timelock;
+    }
 
     modifier dropExists(address tokenAddress) {
         require(drops[tokenAddress] != address(0), "FACTORY_DROP_DOES_NOT_EXIST");
+        _;
+    }
+
+    modifier onlyTimelock() {
+        require(msg.sender == timelock, "FACTORY_ONLY_TIMELOCK");
         _;
     }
 
@@ -30,14 +48,15 @@ contract DropFactory is IDropFactory {
 
     function addDropData(
         uint256 tokenAmount,
-        uint256 deadline,
+        uint256 startDate,
+        uint256 endDate,
         bytes32 merkleRoot,
         address tokenAddress
     ) external override dropExists(tokenAddress) {
         address dropAddress = drops[tokenAddress];
         IERC20(tokenAddress).safeTransferFrom(msg.sender, dropAddress, tokenAmount);
-        Drop(dropAddress).addDropData(msg.sender, merkleRoot, deadline, tokenAmount);
-        emit DropDataAdded(tokenAddress, merkleRoot, tokenAmount, deadline);
+        Drop(dropAddress).addDropData(msg.sender, merkleRoot, startDate, endDate, tokenAmount);
+        emit DropDataAdded(tokenAddress, merkleRoot, tokenAmount, startDate, endDate);
     }
 
     function claimFromDrop(
@@ -47,7 +66,7 @@ contract DropFactory is IDropFactory {
         bytes32 merkleRoot,
         bytes32[] calldata merkleProof
     ) external override dropExists(tokenAddress) {
-        Drop(drops[tokenAddress]).claim(index, msg.sender, amount, merkleRoot, merkleProof);
+        Drop(drops[tokenAddress]).claim(index, msg.sender, amount, fee, feeReceiver, merkleRoot, merkleProof);
         emit DropClaimed(tokenAddress, index, msg.sender, amount, merkleRoot);
     }
 
@@ -58,17 +77,50 @@ contract DropFactory is IDropFactory {
         bytes32[] calldata merkleRoots,
         bytes32[][] calldata merkleProofs
     ) external override dropExists(tokenAddress) {
-        address dropAddress = drops[tokenAddress];
-        address user = msg.sender;
+        uint256 tempFee = fee;
+        address tempFeeReceiver = feeReceiver;
         for (uint256 i = 0; i < indexes.length; i++) {
-            Drop(dropAddress).claim(indexes[i], user, amounts[i], merkleRoots[i], merkleProofs[i]);
-            emit DropClaimed(tokenAddress, indexes[i], user, amounts[i], merkleRoots[i]);
+            Drop(drops[tokenAddress]).claim(indexes[i], msg.sender, amounts[i], tempFee, tempFeeReceiver, merkleRoots[i], merkleProofs[i]);
+            emit DropClaimed(tokenAddress, indexes[i], msg.sender, amounts[i], merkleRoots[i]);
         }
     }
 
-    function withdrawFromDropAfterDeadline(address tokenAddress, bytes32 merkleRoot) external override dropExists(tokenAddress) {
-        uint256 withdrawAmount = Drop(drops[tokenAddress]).withdrawAfterDeadline(msg.sender, merkleRoot);
+    function withdraw(address tokenAddress, bytes32 merkleRoot) external override dropExists(tokenAddress) {
+        uint256 withdrawAmount = Drop(drops[tokenAddress]).withdraw(msg.sender, merkleRoot);
         emit DropWithdrawn(tokenAddress, msg.sender, merkleRoot, withdrawAmount);
+    }
+
+    function updateFee(uint256 newFee) external override onlyTimelock {
+        // max fee 20%
+        require(newFee < 2000, "FACTORY_MAX_FEE_EXCEED");
+        fee = newFee;
+    }
+
+    function updateFeeReceiver(address newFeeReceiver) external override onlyTimelock {
+        feeReceiver = newFeeReceiver;
+    }
+
+    function pause(address tokenAddress, bytes32 merkleRoot) external override {
+        Drop(drops[tokenAddress]).pause(msg.sender, merkleRoot);
+    }
+
+    function unpause(address tokenAddress, bytes32 merkleRoot) external override {
+        Drop(drops[tokenAddress]).unpause(msg.sender, merkleRoot);
+    }
+
+    function getDropDetails(address tokenAddress, bytes32 merkleRoot)
+        external
+        view
+        override
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            address,
+            bool
+        )
+    {
+        return Drop(drops[tokenAddress]).dropData(merkleRoot);
     }
 
     function isDropClaimed(
