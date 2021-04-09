@@ -2,7 +2,6 @@
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/utils/Create2.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./interfaces/IDropFactory.sol";
 
@@ -54,7 +53,8 @@ contract DropFactory is IDropFactory {
         address tokenAddress
     ) external override dropExists(tokenAddress) {
         address dropAddress = drops[tokenAddress];
-        IERC20(tokenAddress).safeTransferFrom(msg.sender, dropAddress, tokenAmount);
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), tokenAmount);
+        IERC20(tokenAddress).transfer(dropAddress, tokenAmount);
         Drop(dropAddress).addDropData(msg.sender, merkleRoot, startDate, endDate, tokenAmount);
         emit DropDataAdded(tokenAddress, merkleRoot, tokenAmount, startDate, endDate);
     }
@@ -102,13 +102,18 @@ contract DropFactory is IDropFactory {
 
     function pause(address tokenAddress, bytes32 merkleRoot) external override {
         Drop(drops[tokenAddress]).pause(msg.sender, merkleRoot);
+        emit DropPaused(merkleRoot);
     }
 
     function unpause(address tokenAddress, bytes32 merkleRoot) external override {
         Drop(drops[tokenAddress]).unpause(msg.sender, merkleRoot);
+        DropUnpaused(merkleRoot);
     }
 
-    function getDropDetails(address tokenAddress, bytes32 merkleRoot)
+    function getDropDetails(
+        address tokenAddress,
+        bytes32 merkleRoot //TESTING DONE
+    )
         external
         view
         override

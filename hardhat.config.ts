@@ -52,11 +52,14 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
+
   networks: {
     hardhat: {
       accounts: {
         mnemonic,
       },
+      allowUnlimitedContractSize: true,
+      gas: 9000000000,
       chainId: chainIds.hardhat,
     },
     goerli: createTestnetConfig("goerli"),
@@ -64,6 +67,7 @@ const config: HardhatUserConfig = {
     rinkeby: createTestnetConfig("rinkeby"),
     ropsten: createTestnetConfig("ropsten"),
   },
+
   paths: {
     artifacts: "./artifacts",
     cache: "./cache",
