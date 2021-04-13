@@ -5,6 +5,8 @@ import BalanceTree from "./utils/balance-tree";
 import ERC20Artifact from "../artifacts/contracts/test/ERC20.sol/ERC20.json";
 import { deployContract, MockProvider, solidity } from "ethereum-waffle";
 import web3 from "web3";
+
+import hre from "hardhat";
 use(solidity);
 
 describe("Testing DropFactory Contract", async () => {
@@ -29,7 +31,7 @@ describe("Testing DropFactory Contract", async () => {
     },
   });
 
-  let [wallet0, wallet1, wallet2, wallet3] = provider.getWallets();
+  const [wallet0, wallet1, wallet2, wallet3] = await hre.ethers.getSigners();
   before("testing createDrop", async () => {
     dropFactory = await deployContract(wallet0, DropFactoryArtifact, [2000, wallet0.address, wallet1.address], overrides);
     ercContract = await deployContract(wallet0, ERC20Artifact, ["Flash", "FLASH"], overrides);
