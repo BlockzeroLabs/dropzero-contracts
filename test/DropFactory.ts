@@ -2,7 +2,7 @@ import { expect, use } from "chai";
 import { constants, ethers, Wallet, BigNumber } from "ethers";
 import DropFactoryArtifact from "../artifacts/contracts/DropFactory.sol/DropFactory.json";
 import BalanceTree from "./utils/balance-tree";
-import ERC20Artifact from "../artifacts/contracts/ERC20.sol/ERC20.json";
+import ERC20Artifact from "../artifacts/contracts/test/ERC20.sol/ERC20.json";
 import { deployContract, MockProvider, solidity } from "ethereum-waffle";
 import web3 from "web3";
 use(solidity);

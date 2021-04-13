@@ -1,4 +1,4 @@
-import { bufferToHex, keccak256 } from "ethereumjs-util";
+import { keccak256 } from "ethers/lib/utils";
 
 export default class MerkleTree {
   private readonly elements: Buffer[];
@@ -13,7 +13,7 @@ export default class MerkleTree {
     this.elements = MerkleTree.bufDedup(this.elements);
 
     this.bufferElementPositionIndex = this.elements.reduce<{ [hexElement: string]: number }>((memo, el, index) => {
-      memo[bufferToHex(el)] = index;
+      memo[el.toString()] = index;
       return memo;
     }, {});
 
@@ -55,8 +55,7 @@ export default class MerkleTree {
     if (!second) {
       return first;
     }
-
-    return keccak256(MerkleTree.sortAndConcat(first, second));
+    return Buffer.from(keccak256(MerkleTree.sortAndConcat(first, second)));
   }
 
   getRoot(): Buffer {
@@ -64,11 +63,11 @@ export default class MerkleTree {
   }
 
   getHexRoot(): string {
-    return bufferToHex(this.getRoot());
+    return this.getRoot().toString();
   }
 
   getProof(el: Buffer) {
-    let idx = this.bufferElementPositionIndex[bufferToHex(el)];
+    let idx = this.bufferElementPositionIndex[el.toString()];
 
     if (typeof idx !== "number") {
       throw new Error("Element does not exist in Merkle tree");
@@ -95,7 +94,6 @@ export default class MerkleTree {
 
   private static getPairElement(idx: number, layer: Buffer[]): Buffer | null {
     const pairIdx = idx % 2 === 0 ? idx + 1 : idx - 1;
-
     if (pairIdx < layer.length) {
       return layer[pairIdx];
     } else {
