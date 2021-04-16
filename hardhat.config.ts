@@ -90,9 +90,6 @@ const config: HardhatUserConfig = {
     outDir: "typechain",
     target: "ethers-v5",
   },
-  etherscan: {
-    apiKey: "UAAS3XYSQ7BXNSY791QG5XMKDZCVUZ52BC",
-  },
 };
 
 export default config;

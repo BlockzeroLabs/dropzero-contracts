@@ -8,6 +8,7 @@ export async function deployStubErc20(deployer: Signer, name: string, symbol: st
   const erc20: any = await deployContract(deployer, ERC20Artifact, [name, symbol]);
   return erc20;
 }
+
 export async function deployStubFactory(deployer: Signer, fee: number, feeReceiver: string, timelock: string): Promise<any> {
   const dropFactory: any = await deployContract(deployer, DropFactoryArtifact, [fee, feeReceiver, timelock]);
   return dropFactory;

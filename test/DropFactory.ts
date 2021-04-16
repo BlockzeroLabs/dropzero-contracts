@@ -7,6 +7,7 @@ import TimeLockArtifact from "../artifacts/contracts/test/TimeLockController.sol
 import { deployContract, solidity } from "ethereum-waffle";
 
 import hre from "hardhat";
+
 use(solidity);
 
 describe("Testing DropFactory Contract", async () => {
@@ -18,6 +19,7 @@ describe("Testing DropFactory Contract", async () => {
   let tree3: BalanceTree;
 
   const [wallet0, wallet1, wallet2, wallet3] = await hre.ethers.getSigners();
+ 
   before("Initiating unit tests", async () => {
     timeLockContract = await deployContract(wallet0, TimeLockArtifact, [1617370970, [wallet0.address], [wallet0.address]]);
     dropFactory = await deployStubFactory(wallet0, 2000, wallet0.address, wallet0.address);
@@ -37,6 +39,7 @@ describe("Testing DropFactory Contract", async () => {
       { account: wallet0.address, amount: BigNumber.from("400") },
     ]);
   });
+
   describe("TESTING FACTORY FUNCTIONS", async () => {
     it("Testing Factory Functions", async function () {
       await shouldBehaveLikeFactoryFunctions(dropFactory, ercContract.address, tree1, tree2, tree3, wallet0, wallet1);

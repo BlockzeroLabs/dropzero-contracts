@@ -30,11 +30,13 @@ export async function shouldBehaveLikeFactoryFunctions(
       expect(await dropFactory.createDrop(DUMMY_TOKEN));
     });
   });
+
   describe("CREATING AN EXISTING DROP", async () => {
     it("Should fail while trying to create an existing drop", async function () {
       await expect(dropFactory.createDrop(ercContract)).to.be.revertedWith("FACTORY_DROP_EXISTS");
     });
   });
+
   describe("ADDING DROP DATA TO THE DROP", async () => {
     await shouldBehaveLikeAddDropData(dropFactory, utils.parseEther("5000000"), 1617370970, 1719117998, tree1, tree2, tree3, ercContract);
   });

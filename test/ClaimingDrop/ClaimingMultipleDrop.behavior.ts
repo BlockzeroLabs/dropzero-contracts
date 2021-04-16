@@ -1,10 +1,18 @@
 import { expect } from "chai";
 import BalanceTree from "../utils/balance-tree";
 import { BigNumber } from "ethers";
-export async function shouldBehaveLikeMultipleClaimsFromDrops(dropFactory: any, ercContract: string, tree2: BalanceTree, wallet0: any) {
+export async function shouldBehaveLikeMultipleClaimsFromDrops(
+  dropFactory: any, 
+  ercContract: string, 
+  tree2: BalanceTree, 
+  wallet0: any) {
+ 
   const proofs: string[][] = [];
+ 
   const roots: string[] = [];
+ 
   const indexes: number[] = [];
+
   it("should claim the multiple claims successfully", async function () {
     indexes.push(1);
     indexes.push(0);
