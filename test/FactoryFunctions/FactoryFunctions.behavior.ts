@@ -1,8 +1,8 @@
 import { expect } from "chai";
+import { utils } from "ethers";
 import { shouldBehaveLikeAddDropData } from "../AddingDropData/DropData.behavior";
 import { shouldBehaveLikeGetDropDetails } from "../GetDropDetails/DropDetails.behavior";
 import BalanceTree from "../utils/balance-tree";
-import web3 from "web3";
 import { shouldBehaveLikeClaimFromDrop } from "../ClaimingDrop/ClaimingDrop.behavior";
 import { shouldBehaveLikeMultipleClaimsFromDrops } from "../ClaimingDrop/ClaimingMultipleDrop.behavior";
 import { shouldBehaveLikeWidthdraw } from "../WithdrawDrop/DropWithdraw.behavior";
@@ -36,7 +36,7 @@ export async function shouldBehaveLikeFactoryFunctions(
     });
   });
   describe("ADDING DROP DATA TO THE DROP", async () => {
-    await shouldBehaveLikeAddDropData(dropFactory, web3.utils.toWei("5000000"), 1617370970, 1719117998, tree1, tree2, tree3, ercContract);
+    await shouldBehaveLikeAddDropData(dropFactory, utils.parseEther("5000000"), 1617370970, 1719117998, tree1, tree2, tree3, ercContract);
   });
 
   describe("GETTING DETAILS OF AN ADDED DROP", async () => {

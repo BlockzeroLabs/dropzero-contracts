@@ -1,13 +1,11 @@
 import { use } from "chai";
-import { BigNumber } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { deployStubErc20, deployStubFactory } from "./stubs";
 import BalanceTree from "./utils/balance-tree";
 import { shouldBehaveLikeFactoryFunctions } from "./FactoryFunctions/FactoryFunctions.behavior";
-
 import TimeLockArtifact from "../artifacts/contracts/test/TimeLockController.sol/TimelockController.json";
-
 import { deployContract, solidity } from "ethereum-waffle";
-import web3 from "web3";
+
 import hre from "hardhat";
 use(solidity);
 
@@ -25,7 +23,7 @@ describe("Testing DropFactory Contract", async () => {
     dropFactory = await deployStubFactory(wallet0, 2000, wallet0.address, wallet0.address);
     ercContract = await deployStubErc20(wallet0, "Flash", "FLASH");
 
-    await ercContract.approve(dropFactory.address, web3.utils.toWei("90000000"));
+    await ercContract.approve(dropFactory.address, utils.parseEther("90000000"));
     tree1 = new BalanceTree([
       { account: wallet0.address, amount: BigNumber.from("100") },
       { account: wallet0.address, amount: BigNumber.from("101") },
@@ -39,8 +37,9 @@ describe("Testing DropFactory Contract", async () => {
       { account: wallet0.address, amount: BigNumber.from("400") },
     ]);
   });
-
-  it("Testing Factory Functions", async function () {
-    await shouldBehaveLikeFactoryFunctions(dropFactory, ercContract.address, tree1, tree2, tree3, wallet0, wallet1);
+  describe("TESTING FACTORY FUNCTIONS", async () => {
+    it("Testing Factory Functions", async function () {
+      await shouldBehaveLikeFactoryFunctions(dropFactory, ercContract.address, tree1, tree2, tree3, wallet0, wallet1);
+    });
   });
 });
