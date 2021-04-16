@@ -59,4 +59,6 @@ interface IDropFactory {
     event DropDataAdded(address indexed tokenAddress, bytes32 merkleRoot, uint256 tokenAmount, uint256 startDate, uint256 endDate);
     event DropClaimed(address indexed tokenAddress, uint256 index, address indexed account, uint256 amount, bytes32 indexed merkleRoot);
     event DropWithdrawn(address indexed tokenAddress, address indexed account, bytes32 indexed merkleRoot, uint256 amount);
+    event DropPaused(bytes32 merkleRoot);
+    event DropUnpaused(bytes32 merkleRoot);
 }

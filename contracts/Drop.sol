@@ -69,7 +69,7 @@ contract Drop {
         require(MerkleProof.verify(merkleProof, merkleRoot, node), "DROP_INVALID_PROOF");
 
         // Calculate fees
-        uint256 feeAmount = (dd.tokenAmount * fee) / 10000;
+        uint256 feeAmount = (amount * fee) / 10000;
         uint256 userReceivedAmount = amount - feeAmount;
 
         // Subtract from the drop amount

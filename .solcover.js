@@ -7,7 +7,7 @@ if (!mnemonic) {
 }
 
 module.exports = {
-  istanbulReporter: ["html", "lcov"],
+  istanbulReporter: ["html", "lcov", "text"],
   onCompileComplete: async function (_config) {
     await run("typechain");
   },
@@ -20,4 +20,10 @@ module.exports = {
     mnemonic,
   },
   skipFiles: ["mocks", "test"],
+  coverage: {
+    host: "hardhat",
+    network_id: "31337",
+    port: 8555,
+    gas: 0x989680, // <-- Change here for gasLimit
+  },
 };

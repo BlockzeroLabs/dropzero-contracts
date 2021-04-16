@@ -1,5 +1,6 @@
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
+import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
 import "./tasks/accounts";
 import "./tasks/clean";
@@ -30,6 +31,7 @@ if (!process.env.MNEMONIC) {
 }
 
 let infuraApiKey: string;
+
 if (!process.env.INFURA_API_KEY) {
   throw new Error("Please set your INFURA_API_KEY in a .env file");
 } else {
@@ -52,11 +54,14 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
+
   networks: {
     hardhat: {
       accounts: {
         mnemonic,
       },
+      allowUnlimitedContractSize: true,
+      gas: 9000000000,
       chainId: chainIds.hardhat,
     },
     goerli: createTestnetConfig("goerli"),
@@ -64,6 +69,7 @@ const config: HardhatUserConfig = {
     rinkeby: createTestnetConfig("rinkeby"),
     ropsten: createTestnetConfig("ropsten"),
   },
+
   paths: {
     artifacts: "./artifacts",
     cache: "./cache",

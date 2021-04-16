@@ -3,7 +3,6 @@ pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
 import "./interfaces/IDropFactory.sol";
 
 import "./Drop.sol";
@@ -102,10 +101,12 @@ contract DropFactory is IDropFactory {
 
     function pause(address tokenAddress, bytes32 merkleRoot) external override {
         Drop(drops[tokenAddress]).pause(msg.sender, merkleRoot);
+        emit DropPaused(merkleRoot);
     }
 
     function unpause(address tokenAddress, bytes32 merkleRoot) external override {
         Drop(drops[tokenAddress]).unpause(msg.sender, merkleRoot);
+        DropUnpaused(merkleRoot);
     }
 
     function getDropDetails(address tokenAddress, bytes32 merkleRoot)
