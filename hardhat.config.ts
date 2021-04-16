@@ -31,6 +31,7 @@ if (!process.env.MNEMONIC) {
 }
 
 let infuraApiKey: string;
+
 if (!process.env.INFURA_API_KEY) {
   throw new Error("Please set your INFURA_API_KEY in a .env file");
 } else {
