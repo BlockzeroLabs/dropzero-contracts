@@ -1,17 +1,17 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { expect } from "chai";
-import { BigNumber, utils } from "ethers";
+import { BigNumber, utils, Contract } from "ethers";
 import BalanceTree from "../utils/balance-tree";
 
 export async function shouldBehaveLikeAddDropData(
-  dropFactory: any,
+  dropFactory: Contract,
   amount: BigNumber,
   startDate: number,
   endDate: number,
   tree1: BalanceTree,
   tree2: BalanceTree,
   tree3: BalanceTree,
-  token: any,
+  token: Contract,
   wallet0: SignerWithAddress,
 ) {
   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";

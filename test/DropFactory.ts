@@ -1,5 +1,5 @@
 import { use } from "chai";
-import { BigNumber, utils } from "ethers";
+import { BigNumber, utils, Contract } from "ethers";
 import { deployStubErc20, deployStubFactory } from "./stubs";
 import BalanceTree from "./utils/balance-tree";
 import { shouldBehaveLikeFactoryFunctions } from "./FactoryFunctions/FactoryFunctions.behavior";
@@ -11,8 +11,8 @@ import hre from "hardhat";
 use(solidity);
 
 describe("Testing DropFactory Contract", async () => {
-  let dropFactory: any;
-  let ercContract: any;
+  let dropFactory: Contract;
+  let ercContract: Contract;
   let timeLockContract: any;
   let tree1: BalanceTree;
   let tree2: BalanceTree;

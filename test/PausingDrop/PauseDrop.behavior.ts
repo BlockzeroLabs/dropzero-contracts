@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import BalanceTree from "../utils/balance-tree";
-import { BigNumber } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 const DUMMY_TOKEN = "0x0000000000000000000000000000000000000001";
-export async function shouldBehaveLikePause(dropFactory: any, token: any, tree1: BalanceTree, wallet0: SignerWithAddress) {
+export async function shouldBehaveLikePause(dropFactory: any, token: Contract, tree1: BalanceTree, wallet0: SignerWithAddress) {
   it("should fail while pausing a drop of unowned drop", async function () {
     await expect(dropFactory.pause(DUMMY_TOKEN, tree1.getHexRoot())).to.be.revertedWith("NOT_OWNER");
   });
