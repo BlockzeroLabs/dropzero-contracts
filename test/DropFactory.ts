@@ -13,7 +13,7 @@ use(solidity);
 describe("Testing DropFactory Contract", async () => {
   let dropFactory: Contract;
   let ercContract: Contract;
-  let timeLockContract: any;
+  let timeLockContract;
   let tree1: BalanceTree;
   let tree2: BalanceTree;
   let tree3: BalanceTree;

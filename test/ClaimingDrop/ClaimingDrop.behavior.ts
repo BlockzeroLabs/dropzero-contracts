@@ -1,7 +1,14 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { expect } from "chai";
 import { BigNumber, Contract } from "ethers";
-export async function shouldBehaveLikeClaimFromDrop(dropFactory: any, tree1: any, wallet0: SignerWithAddress, wallet1: SignerWithAddress, token: Contract) {
+import BalanceTree from "../utils/balance-tree";
+export async function shouldBehaveLikeClaimFromDrop(
+  dropFactory: Contract,
+  tree1: BalanceTree,
+  wallet0: SignerWithAddress,
+  wallet1: SignerWithAddress,
+  token: Contract,
+) {
   const proof1 = tree1.getProof(1, wallet0.address, BigNumber.from("101"));
   it("should claim a drop successfully", async function () {
     console.log("Wallet0 balance before claim", (await token.balanceOf(wallet0.address)).toString());

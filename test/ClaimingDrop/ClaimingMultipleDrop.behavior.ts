@@ -3,7 +3,7 @@ import BalanceTree from "../utils/balance-tree";
 import { BigNumber, Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 export async function shouldBehaveLikeMultipleClaimsFromDrops(
-  dropFactory: any,
+  dropFactory: Contract,
   token: Contract,
   tree2: BalanceTree,
   wallet0: SignerWithAddress,

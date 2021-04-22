@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { utils } from "ethers";
+import { utils, Contract } from "ethers";
 import { shouldBehaveLikeAddDropData } from "../AddingDropData/DropData.behavior";
 import { shouldBehaveLikeGetDropDetails } from "../GetDropDetails/DropDetails.behavior";
 import BalanceTree from "../utils/balance-tree";
@@ -13,8 +13,8 @@ import { shoudlBehaveLikeUpdateFeeReceiver } from "../UpdatingFeeReceiver/Update
 import { shouldBehaveLikeUpdateFees } from "../UpdatingFees/UpdatingFees.behavior";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 export async function shouldBehaveLikeFactoryFunctions(
-  dropFactory: any,
-  ercContract: any,
+  dropFactory: Contract,
+  ercContract: Contract,
   tree1: BalanceTree,
   tree2: BalanceTree,
   tree3: BalanceTree,
