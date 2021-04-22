@@ -11,19 +11,20 @@ import { shouldBehaveLikeUnPauseWithdraw } from "../UnpausingDrop/UnpauseDrop.be
 import { shouldBehaveLikeIsClaimed } from "../DropClaimed/DropClaimed.behavior";
 import { shoudlBehaveLikeUpdateFeeReceiver } from "../UpdatingFeeReceiver/UpdateFeeReceiver.behavior";
 import { shouldBehaveLikeUpdateFees } from "../UpdatingFees/UpdatingFees.behavior";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 export async function shouldBehaveLikeFactoryFunctions(
   dropFactory: any,
   ercContract: any,
   tree1: BalanceTree,
   tree2: BalanceTree,
   tree3: BalanceTree,
-  wallet0: any,
-  wallet1: any,
+  wallet0: SignerWithAddress,
+  wallet1: SignerWithAddress,
 ): Promise<any> {
   const DUMMY_TOKEN = "0x0000000000000000000000000000000000000001";
   describe("TESTING THE CREATION OF DROP", async () => {
     it("Should create a drop", async function () {
-      expect(await dropFactory.createDrop(ercContract));
+      expect(await dropFactory.createDrop(ercContract.address));
     });
 
     it("Should create another drop", async function () {
@@ -33,12 +34,12 @@ export async function shouldBehaveLikeFactoryFunctions(
 
   describe("CREATING AN EXISTING DROP", async () => {
     it("Should fail while trying to create an existing drop", async function () {
-      await expect(dropFactory.createDrop(ercContract)).to.be.revertedWith("FACTORY_DROP_EXISTS");
+      await expect(dropFactory.createDrop(ercContract.address)).to.be.revertedWith("FACTORY_DROP_EXISTS");
     });
   });
 
   describe("ADDING DROP DATA TO THE DROP", async () => {
-    await shouldBehaveLikeAddDropData(dropFactory, utils.parseEther("5000000"), 1617370970, 1719117998, tree1, tree2, tree3, ercContract);
+    await shouldBehaveLikeAddDropData(dropFactory, utils.parseEther("5000000"), 1617370970, 1719117998, tree1, tree2, tree3, ercContract, wallet0);
   });
 
   describe("GETTING DETAILS OF AN ADDED DROP", async () => {
@@ -50,19 +51,19 @@ export async function shouldBehaveLikeFactoryFunctions(
   });
 
   describe("UNPAUSING A DROP", async () => {
-    await shouldBehaveLikeUnPauseWithdraw(dropFactory, ercContract, tree1, wallet0);
+    await shouldBehaveLikeUnPauseWithdraw(dropFactory, ercContract, tree1);
   });
 
   describe("CLAIMING A SINGLE DROP", async () => {
-    await shouldBehaveLikeClaimFromDrop(dropFactory, ercContract, tree1, wallet0);
+    await shouldBehaveLikeClaimFromDrop(dropFactory, tree1, wallet0, wallet1, ercContract);
   });
 
   describe("CLAIMING MULTIPLE DROPS", async () => {
-    await shouldBehaveLikeMultipleClaimsFromDrops(dropFactory, ercContract, tree2, wallet0);
+    await shouldBehaveLikeMultipleClaimsFromDrops(dropFactory, ercContract, tree2, wallet0, wallet1);
   });
 
   describe("WITHDRAW A DROP", async () => {
-    await shouldBehaveLikeWidthdraw(dropFactory, ercContract, tree1);
+    await shouldBehaveLikeWidthdraw(dropFactory, ercContract, tree1, wallet0);
   });
 
   describe("IS CLAIMED", async () => {

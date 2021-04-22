@@ -19,10 +19,10 @@ describe("Testing DropFactory Contract", async () => {
   let tree3: BalanceTree;
 
   const [wallet0, wallet1, wallet2, wallet3] = await hre.ethers.getSigners();
- 
+
   before("Initiating unit tests", async () => {
     timeLockContract = await deployContract(wallet0, TimeLockArtifact, [1617370970, [wallet0.address], [wallet0.address]]);
-    dropFactory = await deployStubFactory(wallet0, 2000, wallet0.address, wallet0.address);
+    dropFactory = await deployStubFactory(wallet0, 2000, wallet1.address, wallet0.address);
     ercContract = await deployStubErc20(wallet0, "Flash", "FLASH");
 
     await ercContract.approve(dropFactory.address, utils.parseEther("90000000"));
@@ -42,7 +42,8 @@ describe("Testing DropFactory Contract", async () => {
 
   describe("TESTING FACTORY FUNCTIONS", async () => {
     it("Testing Factory Functions", async function () {
-      await shouldBehaveLikeFactoryFunctions(dropFactory, ercContract.address, tree1, tree2, tree3, wallet0, wallet1);
+      console.log("WALLET0", (await ercContract.balanceOf(wallet0.address)).toString());
+      await shouldBehaveLikeFactoryFunctions(dropFactory, ercContract, tree1, tree2, tree3, wallet0, wallet1);
     });
   });
 });
