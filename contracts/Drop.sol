@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.3;
+pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -42,10 +42,7 @@ contract Drop {
         uint256 endDate,
         uint256 tokenAmount
     ) external onlyFactory {
-        require(dropData[merkleRoot].startDate == 0, "DROP_EXISTS");
-        require(endDate > block.timestamp, "DROP_INVALID_END_DATE");
-        require(endDate > startDate, "DROP_INVALID_START_DATE");
-        dropData[merkleRoot] = DropData(startDate, endDate, tokenAmount, owner, true);
+        _addDropData(owner, merkleRoot, startDate, endDate, tokenAmount);
     }
 
     function claim(
@@ -79,6 +76,34 @@ contract Drop {
         _setClaimed(index, merkleRoot);
         IERC20(token).safeTransfer(account, userReceivedAmount);
         IERC20(token).safeTransfer(feeReceiver, feeAmount);
+    }
+
+    function _addDropData(
+        address owner,
+        bytes32 merkleRoot,
+        uint256 startDate,
+        uint256 endDate,
+        uint256 tokenAmount
+    ) internal {
+        require(dropData[merkleRoot].startDate == 0, "DROP_EXISTS");
+        require(endDate > block.timestamp, "DROP_INVALID_END_DATE");
+        require(endDate > startDate, "DROP_INVALID_START_DATE");
+        dropData[merkleRoot] = DropData(startDate, endDate, tokenAmount, owner, true);
+    }
+
+    function update(
+        address account,
+        bytes32 merkleRoot,
+        bytes32 newMerkleRoot,
+        uint256 newStartDate,
+        uint256 newEndDate,
+        uint256 newTokenAmount
+    ) external onlyFactory returns (uint256 tokenAmount) {
+        DropData memory dd = dropData[merkleRoot];
+        require(dd.owner == account, "DROP_ONLY_OWNER");
+        tokenAmount = dd.tokenAmount + newTokenAmount;
+        _addDropData(dd.owner, newMerkleRoot, newStartDate, newEndDate, tokenAmount);
+        delete dropData[merkleRoot];
     }
 
     function withdraw(address account, bytes32 merkleRoot) external onlyFactory returns (uint256) {

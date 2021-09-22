@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.3;
+pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -58,6 +58,20 @@ contract DropFactory is IDropFactory {
         emit DropDataAdded(tokenAddress, merkleRoot, tokenAmount, startDate, endDate);
     }
 
+    function updateDropData(
+        uint256 additionalTokenAmount,
+        uint256 startDate,
+        uint256 endDate,
+        bytes32 oldMerkleRoot,
+        bytes32 newMerkleRoot,
+        address tokenAddress
+    ) external override dropExists(tokenAddress) {
+        address dropAddress = drops[tokenAddress];
+        IERC20(tokenAddress).safeTransferFrom(msg.sender, dropAddress, additionalTokenAmount);
+        uint256 tokenAmount = Drop(dropAddress).update(msg.sender, oldMerkleRoot, newMerkleRoot, startDate, endDate, additionalTokenAmount);
+        emit DropDataUpdated(tokenAddress, oldMerkleRoot, newMerkleRoot, tokenAmount, startDate, endDate);
+    }
+
     function claimFromDrop(
         address tokenAddress,
         uint256 index,
@@ -106,7 +120,7 @@ contract DropFactory is IDropFactory {
 
     function unpause(address tokenAddress, bytes32 merkleRoot) external override {
         Drop(drops[tokenAddress]).unpause(msg.sender, merkleRoot);
-        DropUnpaused(merkleRoot);
+        emit DropUnpaused(merkleRoot);
     }
 
     function getDropDetails(address tokenAddress, bytes32 merkleRoot)
