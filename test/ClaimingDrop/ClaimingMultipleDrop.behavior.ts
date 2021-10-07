@@ -1,16 +1,18 @@
 import { expect } from "chai";
 import BalanceTree from "../utils/balance-tree";
-import { BigNumber } from "ethers";
+import { BigNumber, Contract } from "ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 export async function shouldBehaveLikeMultipleClaimsFromDrops(
-  dropFactory: any, 
-  ercContract: string, 
-  tree2: BalanceTree, 
-  wallet0: any) {
- 
+  dropFactory: Contract,
+  token: Contract,
+  tree2: BalanceTree,
+  wallet0: SignerWithAddress,
+  wallet1: SignerWithAddress,
+) {
   const proofs: string[][] = [];
- 
+
   const roots: string[] = [];
- 
+
   const indexes: number[] = [];
 
   it("should claim the multiple claims successfully", async function () {
@@ -22,6 +24,9 @@ export async function shouldBehaveLikeMultipleClaimsFromDrops(
     proofs.push(proof1);
     roots.push(tree2.getHexRoot());
     roots.push(tree2.getHexRoot());
-    expect(await dropFactory.multipleClaimsFromDrop(ercContract, indexes, [BigNumber.from("100"), BigNumber.from("200")], roots, proofs));
+    await expect(() =>
+      dropFactory.multipleClaimsFromDrop(token.address, indexes, [BigNumber.from("100"), BigNumber.from("200")], roots, proofs),
+    ).to.changeTokenBalances(token, [wallet0, wallet1], [BigNumber.from("240"), BigNumber.from("60")]); //Total fees of these claims = 60
+    const dropAddress = await dropFactory.drops(token.address);
   });
 }

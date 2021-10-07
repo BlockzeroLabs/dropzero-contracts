@@ -15,11 +15,10 @@ async function deployDropFactory(): Promise<void> {
   const [Factory] = await ethers.getSigners();
   console.log("Factory address", Factory.address);
   const factory = new ContractFactory(DropFactory.abi, DropFactory.bytecode, Factory);
-  let tx = await factory.deploy(2000, "0x43D964B802c2Ce187653F6A01D6678E6cA0DC9Bb", "0x2A85e6904f509ce75998a0E226193AD70c201bD4", {
+  let tx = await factory.deploy(50, "0xFeB0EDC77a133a62D740c5A357C4B4E5c537677b", "0x2A85e6904f509ce75998a0E226193AD70c201bD4", {
     gasLimit: 3000000,
   });
   console.log(tx.hash);
 }
 
 deployDropFactory();
-
