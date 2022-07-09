@@ -75,7 +75,9 @@ contract Drop {
         // Mark it claimed and send the tokens.
         _setClaimed(index, merkleRoot);
         IERC20(token).safeTransfer(account, userReceivedAmount);
-        IERC20(token).safeTransfer(feeReceiver, feeAmount);
+        if (feeAmount > 0) {
+            IERC20(token).safeTransfer(feeReceiver, feeAmount);
+        }
     }
 
     function _addDropData(
